@@ -22,7 +22,7 @@ func (m *manual) initFlags() {
 
 	// 存放命令行参数变量
 	flag.BoolVar(&m.printVersion, "v", false, "Print this builds version information")
-	flag.StringVar(&m.configFile, "c", "", "yaml file to load")
+	flag.StringVar(&m.configFile, "c", "test", "yaml file to load")
 
 	// 解析命令行
 	flag.Parse()
@@ -55,7 +55,8 @@ func usagePrint(n string) string {
 }
 
 // 注册命令行
-func RegisterFlags() {
+func RegisterFlags() string {
 	var m manual
 	m.initFlags()
+	return m.configFile
 }

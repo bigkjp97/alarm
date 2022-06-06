@@ -1,11 +1,14 @@
 package utils
 
 import (
-	"github.com/jinzhu/configor"
+	"fmt"
 	"log"
 	"time"
+
+	"github.com/jinzhu/configor"
 )
 
+// 配置文件结构
 type config struct {
 	app struct {
 		service_name string        `default:"app"`
@@ -38,11 +41,18 @@ type config struct {
 	}
 }
 
+// 解析配置文件
 func parseConfig(c *config, cfg string) {
+	fmt.Println(cfg)
 	err := configor.New(&configor.Config{
 		AutoReload:         true,
-		AutoReloadInterval: 10 * time.Second}).Load(config, cfg)
+		AutoReloadInterval: 10 * time.Second}).Load(c, cfg)
 	if err != nil {
 		log.Fatalf("load config file %s error: %v", cfg, err)
 	}
+}
+
+func ParseConfig(cfg string) {
+	var c config
+	parseConfig(&c, cfg)
 }

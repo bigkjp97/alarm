@@ -28,6 +28,6 @@ func main() {
 	// var m Manual
 
 	// m.RegisterFlags(f, os.Args[2:])
-	utils.RegisterFlags()
-
+	cfg := utils.RegisterFlags()
+	utils.ParseConfig(cfg)
 }
