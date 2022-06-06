@@ -33,10 +33,12 @@ func (m *manual) initFlags() {
 	}
 }
 
+// 显示版本
 func showVersion() {
 	fmt.Printf("Version: %s\n", version)
 }
 
+// 显示使用说明
 func usagePrint(n string) string {
 	return fmt.Sprintf(`
 	 ------------------------------
