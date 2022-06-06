@@ -2,21 +2,13 @@ package main
 
 import (
 	"alarm/pkg/utils"
-	"flag"
-	"fmt"
-	"os"
 
 	// embed time zone data
 	_ "time/tzdata"
 )
 
 func init() {
-	flag.Usage = func() {
-		utils.ShowVersion()
-		fmt.Fprint(os.Stderr, utils.Usage("Alarm"))
-	}
 
-	flag.Parse()
 }
 
 func main() {
@@ -36,4 +28,6 @@ func main() {
 	// var m Manual
 
 	// m.RegisterFlags(f, os.Args[2:])
+	utils.RegisterFlags()
+
 }
