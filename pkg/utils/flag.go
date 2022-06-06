@@ -8,33 +8,36 @@ import (
 
 var version = "v2.0"
 
+// 命令行结构
 type manual struct {
-	printVersion string
+	printVersion bool
 	configFile   string
 }
 
-func (m *manual) InitFlags() {
+func (m *manual) initFlags() {
+	// 重写Usage
 	flag.Usage = func() {
-		ShowVersion()
-		fmt.Fprint(os.Stderr, Usage("Alarm"))
+		fmt.Fprint(os.Stderr, usagePrint("Alarm"))
 	}
 
-	flag.StringVar(&m.printVersion, "v", version, "Print this builds version information")
+	// 存放命令行参数变量
+	flag.BoolVar(&m.printVersion, "v", false, "Print this builds version information")
 	flag.StringVar(&m.configFile, "c", "", "yaml file to load")
 
+	// 解析命令行
 	flag.Parse()
+
+	// 如果输入-v，则变量为true，判断后打印版本
+	if m.printVersion {
+		showVersion()
+	}
 }
 
-func RegisterFlags() {
-	var m manual
-	m.InitFlags()
-}
-
-func ShowVersion() {
+func showVersion() {
 	fmt.Printf("Version: %s\n", version)
 }
 
-func Usage(n string) string {
+func usagePrint(n string) string {
 	return fmt.Sprintf(`
 	 ------------------------------
 	 Usage: %s [options...]
@@ -47,4 +50,10 @@ func Usage(n string) string {
 
 	   %s -c conf/config.yaml
 	`, n, n)
+}
+
+// 注册命令行
+func RegisterFlags() {
+	var m manual
+	m.initFlags()
 }
