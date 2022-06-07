@@ -3,53 +3,53 @@ package utils
 import (
 	"fmt"
 	"log"
+	"os"
 	"time"
 
-	"github.com/jinzhu/configor"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // 配置文件结构
 type config struct {
 	app struct {
-		service_name string        `default:"app"`
-		log_file     string        `default:"app"`
-		log_level    string        `default:"INFO"`
-		interval     time.Duration `default: 60`
-		channel_size uint16        `default:10`
+		service_name string
+		log_file     string
+		log_level    string
+		interval     time.Duration
+		channel_size uint16
 	}
 
 	database struct {
-		db_type  string `default:"mysql"`
-		db_host  string `default:"localhost"`
-		db_port  string `default:"3306"`
-		db_name  string `default:"dbname"`
-		username string `default:"user"`
-		password string `default:"password"`
-		charset  string `default:"utf8mb4"`
+		db_type  string
+		db_host  string
+		db_port  string
+		db_name  string
+		username string
+		password string
+		charset  string
 	}
 
 	redis struct {
-		network      string        `default:"tcp"`
-		address      string        `default:"127.0.0.1:6379"`
-		password     string        `default: ""`
-		max_idle     int           `default:5`   // 最大的空闲连接数
-		idle_timeout time.Duration `default:240` // 最大的空闲连接等待时间，单位 秒
-		db           int           `default:0`
-		queue_name   string        `default:"queue"`
-		touch_name   string        `default:"touch"`
-		stats_name   string        `default:"stats"` // Redis 查询状态保存
+		network      string
+		address      string
+		auth         string
+		max_idle     int
+		idle_timeout time.Duration
+		db_select    int
+		queue_name   string
+		touch_name   string
+		stats_name   string
 	}
 }
 
 // 解析配置文件
 func parseConfig(c *config, cfg string) {
-	fmt.Println(cfg)
-	err := configor.New(&configor.Config{
-		AutoReload:         true,
-		AutoReloadInterval: 10 * time.Second}).Load(c, cfg)
+	f, err := os.Open(cfg)
 	if err != nil {
 		log.Fatalf("load config file %s error: %v", cfg, err)
 	}
+	yaml.NewDecoder(f).Decode(c)
+	fmt.Println(c)
 }
 
 func ParseConfig(cfg string) {

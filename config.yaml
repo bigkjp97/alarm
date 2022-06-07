@@ -1,11 +1,11 @@
 app:
-    servicename: "alarm"
-    logfile: "logs/app"
-    loglevel: "INFO"
+    service_name: "alarm"
+    log_file: "logs/app"
+    log_level: "INFO"
     interval: 30
-    channelsize: 100
+    channel_size: 100
 
-db_config:
+database:
     db_type: mysql
     db_host: 127.0.0.1
     db_port: 3306
@@ -17,10 +17,10 @@ db_config:
 redis:
     network: tcp
     address: "127.0.0.1:6379"
-    password: 
-    maxidle: 5 
-    idletimeout: 240
-    db: 0
-    queuename: "ywb.alarm.queue"
-    touchname: "ywb.alarm.touch"
-    statsname: "ywb.alarm.stats.hash"
+    auth:
+    max_idle: 5
+    idle_timeout: 240
+    db_select: 0
+    queue_name: "ywb.alarm.queue"
+    touch_name: "ywb.alarm.touch"
+    stats_name: "ywb.alarm.stats.hash"
