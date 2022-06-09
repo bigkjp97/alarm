@@ -16,8 +16,8 @@ database:
 
 redis:
     network: tcp
-    address: "127.0.0.1:6379"
-    auth:
+    address: "10.89.5.140:7980"
+    auth: "helloworld"
     max_idle: 5
     idle_timeout: 240
     db_select: 0

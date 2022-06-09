@@ -43,7 +43,7 @@ type Config struct {
 }
 
 // 解析配置文件
-func parseConfig(c *Config, cfg string) {
+func parseConfig(c *Config, cfg string) *Config {
 	f, err := ioutil.ReadFile(cfg)
 	if err != nil {
 		log.Fatalf("load config file %s error: %v", cfg, err)
@@ -60,9 +60,10 @@ func parseConfig(c *Config, cfg string) {
 	}
 
 	fmt.Println(string(y))
+	return c
 }
 
-func ParseConfig(cfg string) {
-	var c Config
-	parseConfig(&c, cfg)
+func ParseConfig(c *Config, cfg string) *Config {
+	// 传入指针
+	return parseConfig(c, cfg)
 }
