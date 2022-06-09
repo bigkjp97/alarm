@@ -10,8 +10,8 @@ var version = "v2.0"
 
 // 命令行结构
 type manual struct {
-	printVersion bool
-	configFile   string
+	print_version bool
+	config_file   string
 }
 
 func (m *manual) initFlags() {
@@ -21,14 +21,14 @@ func (m *manual) initFlags() {
 	}
 
 	// 存放命令行参数变量
-	flag.BoolVar(&m.printVersion, "v", false, "Print this builds version information")
-	flag.StringVar(&m.configFile, "c", "test", "yaml file to load")
+	flag.BoolVar(&m.print_version, "v", false, "Print this builds version information")
+	flag.StringVar(&m.config_file, "c", "test", "yaml file to load")
 
 	// 解析命令行
 	flag.Parse()
 
 	// 如果输入-v，则变量为true，判断后打印版本
-	if m.printVersion {
+	if m.print_version {
 		showVersion()
 	}
 }
@@ -58,5 +58,5 @@ func usagePrint(n string) string {
 func RegisterFlags() string {
 	var m manual
 	m.initFlags()
-	return m.configFile
+	return m.config_file
 }

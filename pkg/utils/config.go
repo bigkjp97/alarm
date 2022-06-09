@@ -2,57 +2,67 @@ package utils
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
-	"os"
 	"time"
 
 	yaml "gopkg.in/yaml.v2"
 )
 
 // 配置文件结构
-type config struct {
-	app struct {
-		service_name string
-		log_file     string
-		log_level    string
-		interval     time.Duration
-		channel_size uint16
+type Config struct {
+	App struct {
+		Service_name string
+		Log_file     string
+		Log_level    string
+		Interval     time.Duration
+		Channel_size int
 	}
 
-	database struct {
-		db_type  string
-		db_host  string
-		db_port  string
-		db_name  string
-		username string
-		password string
-		charset  string
+	Database struct {
+		Db_type  string
+		Db_host  string
+		Db_port  string
+		Db_name  string
+		Username string
+		Password string
+		Charset  string
 	}
 
-	redis struct {
-		network      string
-		address      string
-		auth         string
-		max_idle     int
-		idle_timeout time.Duration
-		db_select    int
-		queue_name   string
-		touch_name   string
-		stats_name   string
+	Redis struct {
+		Network      string
+		Address      string
+		Auth         string
+		Max_idle     int
+		Idle_timeout time.Duration
+		Db_select    int
+		Queue_name   string
+		Touch_name   string
+		Stats_name   string
 	}
 }
 
 // 解析配置文件
-func parseConfig(c *config, cfg string) {
-	f, err := os.Open(cfg)
+func parseConfig(c *Config, cfg string) {
+	f, err := ioutil.ReadFile(cfg)
 	if err != nil {
 		log.Fatalf("load config file %s error: %v", cfg, err)
 	}
-	yaml.NewDecoder(f).Decode(c)
-	fmt.Println(c)
+
+	err = yaml.Unmarshal([]byte(f), c)
+	if err != nil {
+		log.Fatalf("unmarshal config file %s error: %v", cfg, err)
+	}
+
+	y, err := yaml.Marshal(c)
+	if err != nil {
+		log.Fatalf("marshal config file %s error: %v", cfg, err)
+	}
+
+	fmt.Println(string(y))
 }
 
 func ParseConfig(cfg string) {
-	var c config
+	var c Config
 	parseConfig(&c, cfg)
 }

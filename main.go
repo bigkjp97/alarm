@@ -1,5 +1,10 @@
 package main
 
+/**
+author: KJP
+mark: 方法使用驼峰，变量使用下划线
+*/
+
 import (
 	"alarm/pkg/utils"
 
