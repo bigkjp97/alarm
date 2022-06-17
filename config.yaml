@@ -9,14 +9,14 @@ database:
     db_type: mysql
     db_host: 127.0.0.1
     db_port: 3306
-    db_name: dbname
-    username: "user"
-    password: "password"
+    db_name: goadmin
+    username: goadmin
+    password: helloworld
     charset: utf8mb4
 
 redis:
     network: tcp
-    address: "10.89.5.140:7980"
+    address: "127.0.0.1:7980"
     auth: "helloworld"
     max_idle: 5
     idle_timeout: 240

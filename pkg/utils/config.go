@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"fmt"
+	// "fmt"
 	"io/ioutil"
 	"log"
 	"time"
@@ -54,12 +54,12 @@ func parseConfig(c *Config, cfg string) *Config {
 		log.Fatalf("unmarshal config file %s error: %v", cfg, err)
 	}
 
-	y, err := yaml.Marshal(c)
-	if err != nil {
-		log.Fatalf("marshal config file %s error: %v", cfg, err)
-	}
+	// y, err := yaml.Marshal(c)
+	// if err != nil {
+	// 	log.Fatalf("marshal config file %s error: %v", cfg, err)
+	// }
 
-	fmt.Println(string(y))
+	// fmt.Println(string(y))
 	return c
 }
 
