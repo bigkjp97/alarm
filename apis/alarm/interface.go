@@ -3,11 +3,11 @@ package alarm
 import (
 	"alarm/pkg/utils"
 	"encoding/json"
-	"fmt"
+	// "fmt"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
-	"github.com/patrickmn/go-cache"
+	// "github.com/patrickmn/go-cache"
 )
 
 type Msg struct {
@@ -24,34 +24,15 @@ type Status struct {
 	Send_count      int64     `json:"send_count"`      // 发送计数
 }
 
-// 更新状态缓存
-func setStatus(cache *cache.Cache, s Status, sch chan Status, exp time.Duration) {
-	// 全局的管道
-	cache.Set(s.Code, s, exp)
-	sch <- s
-}
-
-// 获取状态缓存
-func getStatus(c *utils.Config, r *redis.Pool, cache *cache.Cache, k string) (Status, error) {
-	fmt.Println(k)
-	if val, found := cache.Get(k); found {
-		fmt.Println(found)
-		fmt.Println(val.(Status))
-		return val.(Status), nil
-	}
-
-	return statusFromRedis(c, r, k)
-}
-
 // 状态缓存保存到redis
-func statusToRedis(c *utils.Config, r *redis.Pool, s_ch chan Status) {
+func (server *Server) statusToRedis(s_ch chan Status) {
 	// var wg sync.WaitGroup
 	// defer wg.Done()
-	rc := r.Get()
+	rc := server.Pool.Get()
 	defer rc.Close()
 	for status := range s_ch {
 		jstr, _ := json.Marshal(status)
-		if _, err := rc.Do("HSET", c.Redis.Stats_name, status.Code, jstr); err != nil {
+		if _, err := rc.Do("HSET", server.Cfg.Redis.Stats_name, status.Code, jstr); err != nil {
 			// todo: 错误重试
 			// log.Error("func: srv.cache2Redis(); redis hset:%s error:%v", status.Code, err)
 		}

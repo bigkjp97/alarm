@@ -11,7 +11,7 @@ database:
     db_port: 3306
     db_name: goadmin
     username: goadmin
-    password: helloworld
+    password: "helloworld"
     charset: utf8mb4
 
 redis:

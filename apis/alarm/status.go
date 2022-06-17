@@ -40,9 +40,9 @@ type Schedule struct {
 }
 
 // 节假日、工作日判断流程
-func isSchedule(cmd *AlarmCommand, dbconn *gorm.DB) bool {
+func (server *Server) isSchedule(cmd *AlarmCommand) bool {
 	// 判断今天是不是节日
-	ih := isHoliday(time.Now().Format("20060102"), dbconn)
+	ih := isHoliday(time.Now().Format("20060102"), server.Dbconn)
 	// 引用今天是否告警的判断结构
 	s := Schedule{}
 
@@ -84,12 +84,12 @@ func isSchedule(cmd *AlarmCommand, dbconn *gorm.DB) bool {
 }
 
 // 获取api连接
-func getURLbyID(id int64, dbconn *gorm.DB) (string, error) {
+func (server *Server) getURLbyID(id int64) (string, error) {
 	// 查询接口表名
 	tn := "alarm_apis"
 
 	var a AlarmAPI
-	if err := dbconn.Table(tn).Where("id = ?", id).First(&a).Error; err != nil {
+	if err := server.Dbconn.Table(tn).Where("id = ?", id).First(&a).Error; err != nil {
 		fmt.Println(err)
 		return a.APIUrl, err
 	}
@@ -111,10 +111,28 @@ func getURLbyID(id int64, dbconn *gorm.DB) (string, error) {
 // }
 
 // 获取所有可用告警配置项
-func getItems(dbconn *gorm.DB) ([]AlarmItem, error) {
+func (server *Server) getItems() ([]AlarmItem, error) {
 	var items []AlarmItem
-	if err := dbconn.Table("alarm_items").Where("valid != 'false'").Where("`deleted_at` IS NULL").Preload("Wiki").Preload("Commands").Find(&items).Error; err != nil {
+	if err := server.Dbconn.Table("alarm_items").Where("valid != 'false'").Where("`deleted_at` IS NULL").Preload("Wiki").Preload("Commands").Find(&items).Error; err != nil {
 		return items, err
 	}
 	return items, nil
+}
+
+// 获取状态缓存
+func (server *Server) getStatus(k string) (Status, error) {
+	if val, found := server.Cache.Get(k); found {
+		fmt.Println(found)
+		fmt.Println(val.(Status))
+		return val.(Status), nil
+	}
+
+	return statusFromRedis(server.Cfg, server.Pool, k)
+}
+
+// 更新状态缓存
+func (server *Server) setStatus(s Status, sch chan Status, exp time.Duration) {
+	// 全局的管道
+	server.Cache.Set(s.Code, s, exp)
+	sch <- s
 }

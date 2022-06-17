@@ -6,6 +6,7 @@ mark: 方法使用驼峰，变量使用下划线
 */
 
 import (
+	"time"
 	// "alarm/apis/alarm"
 	"alarm/apis/alarm"
 	"alarm/pkg/conn"
@@ -49,10 +50,11 @@ func main() {
 	if err != nil {
 		return
 	}
-	var cache *cache.Cache
+	cache := cache.New(5*time.Minute, 10*time.Minute)
 
 	var sch chan alarm.Status
-	alarm.RunCheck(c, p, cache, dbconn, sch)
+	server := alarm.Server{Cfg: c, Pool: p, Cache: cache, Dbconn: dbconn}
+	server.RunCheck(sch)
 
 	// conn.TestTables(c)
 

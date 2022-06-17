@@ -13,9 +13,16 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
-func RunCheck(c *utils.Config, r *redis.Pool, cache *cache.Cache, dbconn *gorm.DB,sch chan Status) {
+type Server struct {
+	Cfg    *utils.Config
+	Pool   *redis.Pool
+	Cache  *cache.Cache
+	Dbconn *gorm.DB
+}
+
+func (server *Server) RunCheck(sch chan Status) {
 	// 获取告警项
-	items, err := getItems(dbconn)
+	items, err := server.getItems()
 	if err != nil {
 		fmt.Println("get item error")
 	}
@@ -26,8 +33,9 @@ func RunCheck(c *utils.Config, r *redis.Pool, cache *cache.Cache, dbconn *gorm.D
 		for _, cmd := range item.Commands {
 			// 赋值告警编号
 			code_num := item.Code + "-" + fmt.Sprint(cmd.ID)
+			fmt.Println(code_num)
 			// 获取告警状态
-			status, err := getStatus(c, r, cache, code_num)
+			status, err := server.getStatus(code_num)
 			if err != nil {
 				status.Code = code_num
 			} else if time.Now().Before(status.Last_check_time.Add(time.Duration(item.Interval) * time.Minute)) {
@@ -41,8 +49,12 @@ func RunCheck(c *utils.Config, r *redis.Pool, cache *cache.Cache, dbconn *gorm.D
 			status.Last_check_time = time.Now()
 
 			// 更新状态
-			setStatus(cache, status, sch, time.Duration(item.Interval*item.TriggerNum)*time.Minute)
+			server.setStatus(status, sch, time.Duration(item.Interval*item.TriggerNum)*time.Minute)
 
+			// 判断是否在告警日程
+			if server.isSchedule(&cmd) {
+				
+			}
 		}
 
 	}

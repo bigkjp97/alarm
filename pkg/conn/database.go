@@ -18,6 +18,7 @@ func getMysqlConnString(c *utils.Config) string {
 		c.Database.Db_port,
 		c.Database.Db_name,
 		c.Database.Charset)
+	fmt.Println("")
 	return fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
 		c.Database.Username,
 		c.Database.Password,
