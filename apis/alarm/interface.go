@@ -4,7 +4,6 @@ import (
 	"alarm/pkg/utils"
 	"encoding/json"
 	// "fmt"
-	"time"
 
 	"github.com/gomodule/redigo/redis"
 	// "github.com/patrickmn/go-cache"
@@ -15,14 +14,6 @@ type Msg struct {
 	Wiki AlarmWiki `json:"wiki"`
 }
 
-// 告警状态
-type Status struct {
-	Code            string    // 告警编号
-	Last_check_time time.Time `json:"last_check_time"` // 最后查询时间
-	Last_alarm_time time.Time `json:"last_alarm_time"` // 最后告警时间
-	Alarm_count     int64     `json:"alarm_count"`     // 告警计数
-	Send_count      int64     `json:"send_count"`      // 发送计数
-}
 
 // 状态缓存保存到redis
 func (server *Server) statusToRedis(s_ch chan Status) {

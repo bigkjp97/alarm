@@ -5,10 +5,18 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/jinzhu/gorm"
+	// "github.com/jinzhu/gorm"
 	// "github.com/tidwall/gjson"
 )
+
+// 告警状态
+type Status struct {
+	Code            string    // 告警编号
+	Last_check_time time.Time `json:"last_check_time"` // 最后查询时间
+	Last_alarm_time time.Time `json:"last_alarm_time"` // 最后告警时间
+	Alarm_count     int64     `json:"alarm_count"`     // 告警计数
+	Send_count      int64     `json:"send_count"`      // 发送计数
+}
 
 type Holiday struct {
 	Date    string `json:"date"  gorm:"type:varchar(12);"` // 日期,yyyymmdd
@@ -16,7 +24,7 @@ type Holiday struct {
 }
 
 // 节假日判断
-func isHoliday(d string, dbconn *gorm.DB) bool {
+func (server *Server) isHoliday(d string) bool {
 	// 节假日表名
 	tn := "base_holiday"
 
@@ -25,7 +33,7 @@ func isHoliday(d string, dbconn *gorm.DB) bool {
 	// var holidayMap map[string]bool
 
 	// 获取节假日表
-	dbconn.Table(tn).Where("date = ?", d).First(&h)
+	server.Dbconn.Table(tn).Where("date = ?", d).First(&h)
 
 	fmt.Println(h)
 	// 在redis设置一个键，当天过期，没这个键就查表
@@ -42,7 +50,7 @@ type Schedule struct {
 // 节假日、工作日判断流程
 func (server *Server) isSchedule(cmd *AlarmCommand) bool {
 	// 判断今天是不是节日
-	ih := isHoliday(time.Now().Format("20060102"), server.Dbconn)
+	ih := server.isHoliday(time.Now().Format("20060102"))
 	// 引用今天是否告警的判断结构
 	s := Schedule{}
 
@@ -84,16 +92,16 @@ func (server *Server) isSchedule(cmd *AlarmCommand) bool {
 }
 
 // 获取api连接
-func (server *Server) getURLbyID(id int64) (string, error) {
+func (server *Server) getURLbyID(id int64) (AlarmAPI, error) {
 	// 查询接口表名
 	tn := "alarm_apis"
 
 	var a AlarmAPI
 	if err := server.Dbconn.Table(tn).Where("id = ?", id).First(&a).Error; err != nil {
 		fmt.Println(err)
-		return a.APIUrl, err
+		return a, err
 	}
-	return a.APIUrl, nil
+	return a, nil
 }
 
 // func getURLs() (err error) {
@@ -131,8 +139,8 @@ func (server *Server) getStatus(k string) (Status, error) {
 }
 
 // 更新状态缓存
-func (server *Server) setStatus(s Status, sch chan Status, exp time.Duration) {
+func (server *Server) setStatus(s Status, exp time.Duration) {
 	// 全局的管道
 	server.Cache.Set(s.Code, s, exp)
-	sch <- s
+	server.Status_ch <- s
 }

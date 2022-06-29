@@ -7,16 +7,16 @@ app:
 
 database:
     db_type: mysql
-    db_host: 127.0.0.1
+    db_host: 10.89.5.140
     db_port: 3306
     db_name: goadmin
     username: goadmin
-    password: "helloworld"
+    password: Goadmin!2020
     charset: utf8mb4
 
 redis:
     network: tcp
-    address: "127.0.0.1:7980"
+    address: "10.89.5.140:7980"
     auth: "helloworld"
     max_idle: 5
     idle_timeout: 240
