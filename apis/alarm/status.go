@@ -121,7 +121,7 @@ func (server *Server) getURLbyID(id int64) (AlarmAPI, error) {
 // 获取所有可用告警配置项
 func (server *Server) getItems() ([]AlarmItem, error) {
 	var items []AlarmItem
-	if err := server.Dbconn.Table("alarm_items").Where("valid != 'false'").Where("`deleted_at` IS NULL").Preload("Wiki").Preload("Commands").Find(&items).Error; err != nil {
+	if err := server.Dbconn.Table("alarm_items_test").Where("valid != 'false'").Where("`deleted_at` IS NULL").Preload("Wiki").Preload("Commands").Find(&items).Error; err != nil {
 		return items, err
 	}
 	return items, nil
@@ -135,7 +135,7 @@ func (server *Server) getStatus(k string) (Status, error) {
 		return val.(Status), nil
 	}
 
-	return statusFromRedis(server.Cfg, server.Pool, k)
+	return server.statusFromRedis(k)
 }
 
 // 更新状态缓存
@@ -143,4 +143,5 @@ func (server *Server) setStatus(s Status, exp time.Duration) {
 	// 全局的管道
 	server.Cache.Set(s.Code, s, exp)
 	server.Status_ch <- s
+	fmt.Println("更新状态成功")
 }

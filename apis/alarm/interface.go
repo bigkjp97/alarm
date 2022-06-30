@@ -1,8 +1,10 @@
 package alarm
 
 import (
-	"alarm/pkg/utils"
+	// "alarm/pkg/utils"
 	"encoding/json"
+	"fmt"
+
 	// "fmt"
 
 	"github.com/gomodule/redigo/redis"
@@ -14,38 +16,41 @@ type Msg struct {
 	Wiki AlarmWiki `json:"wiki"`
 }
 
-
 // 状态缓存保存到redis
-func (server *Server) statusToRedis(s_ch chan Status) {
+func (server *Server) statusToRedis() {
 	// var wg sync.WaitGroup
 	// defer wg.Done()
+	fmt.Println("正在缓存当前状态...")
 	rc := server.Pool.Get()
 	defer rc.Close()
-	for status := range s_ch {
+	for status := range server.Status_ch {
 		jstr, _ := json.Marshal(status)
 		if _, err := rc.Do("HSET", server.Cfg.Redis.Stats_name, status.Code, jstr); err != nil {
 			// todo: 错误重试
 			// log.Error("func: srv.cache2Redis(); redis hset:%s error:%v", status.Code, err)
+			fmt.Println("缓存状态失败")
 		}
 	}
 }
 
 // 从redis读取状态缓存
-func statusFromRedis(c *utils.Config, r *redis.Pool, k string) (Status, error) {
+func (server *Server) statusFromRedis(k string) (Status, error) {
 	// defer wg.Done()
 	var status Status
 
-	rc := r.Get()
+	rc := server.Pool.Get()
 	defer rc.Close()
 
-	val, err := redis.Bytes(rc.Do("HGET", c.Redis.Stats_name, k))
+	val, err := redis.Bytes(rc.Do("HGET", server.Cfg.Redis.Stats_name, k))
 	if err != nil {
 		// todo: 错误重试
 		// log.Error("func: srv.cacheFromRedis(); redis hget:%s error:%v", k, err)
+		fmt.Println("空哈希")
 		return status, err
 	}
 
 	err = json.Unmarshal(val, &status)
+	fmt.Println("有状态")
 	return status, err
 }
 

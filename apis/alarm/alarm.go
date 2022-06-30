@@ -60,7 +60,6 @@ func (server *Server) RunCheck() {
 
 			// 更新状态
 			server.setStatus(status, time.Duration(item.Interval*item.TriggerNum)*time.Minute)
-			fmt.Println("更新状态成功")
 
 			// 判断是否在告警日程
 			fmt.Println("检查是否在告警日程内")
@@ -75,6 +74,7 @@ func (server *Server) RunCheck() {
 					api_url = &query.Promethues{}
 				case "influxdb":
 					api_url = &query.Influxdb{}
+					// fmt.Println("查询influxdb")
 				}
 
 				res := &query.Result{}
@@ -121,12 +121,11 @@ func (server *Server) RunCheck() {
 						}
 					}
 				}
-
 			}
 		}
 
 	}
-
+	server.statusToRedis()
 }
 
 // 告警推送
@@ -138,7 +137,7 @@ func (server *Server) runNotice(item AlarmItem, url, cmd_num, cmd, metric, resul
 		status = val.(Status)
 	}
 
-	status, err := statusFromRedis(server.Cfg, server.Pool, code_cmd)
+	status, err := server.statusFromRedis(code_cmd)
 	if err != nil {
 		return err
 	}

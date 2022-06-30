@@ -72,6 +72,7 @@ func (i *Influxdb) Query(res *Result, httpUrl string, cmd string) (err error) {
 	}
 	return nil
 }
+
 func Map2String(m map[string]string) (result string) {
 	list := make([]string, 0)
 	for k, v := range m {
@@ -82,6 +83,7 @@ func Map2String(m map[string]string) (result string) {
 	result = "{" + result + "}"
 	return
 }
+
 func Contains(slice []int, s int) int {
 	for index, value := range slice {
 		if value == s {

@@ -60,7 +60,7 @@ func TestTables(c *utils.Config) {
 		return
 	}
 
-	if err := conn.Table("alarm_items").Where("valid != 'false'").Where("`deleted_at` IS NULL").Preload("Wiki").Preload("Commands").Find(&items).Error; err != nil {
+	if err := conn.Table("alarm_items_test").Where("valid != 'false'").Where("`deleted_at` IS NULL").Preload("Wiki").Preload("Commands").Find(&items).Error; err != nil {
 		return
 	}
 

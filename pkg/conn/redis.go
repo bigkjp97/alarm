@@ -64,7 +64,7 @@ func TestFunc(p *redis.Pool) {
 	con := p.Get()
 	defer con.Close()
 
-	_, err := con.Do("SET", "TESTALARM", 100)
+	_, err := con.Do("SET", "TESTALARM", 10000)
 	if err != nil {
 		fmt.Println(err)
 	}
